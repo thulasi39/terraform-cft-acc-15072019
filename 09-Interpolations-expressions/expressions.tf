@@ -36,6 +36,7 @@ resource "aws_instance" "frontend" {
   availability_zone = "${var.us-east-zones[count.index]}"
   ami               = "ami-026c8acd92718196b"
   instance_type     = "t2.micro"
+  count		    = 2 
 }
 
 resource "aws_instance" "west_frontend" {
@@ -75,7 +76,7 @@ resource "aws_instance" "west_backend" {
 }
 
 output "frontend_ip" {
-  value = "${aws_instance.frontend.public_ip}"
+  value = "${aws_instance.frontend.*.public_ip}"
 }
 
 output "backend_ips" {
