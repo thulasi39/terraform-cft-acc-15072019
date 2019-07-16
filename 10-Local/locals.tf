@@ -39,7 +39,7 @@ resource "aws_instance" "frontend" {
 
   depends_on        = ["aws_instance.backend"]
   availability_zone = "${var.us-east-zones[count.index]}"
-  ami               = "ami-66506c1c"
+  ami               = "ami-026c8acd92718196b"
   instance_type     = "t2.micro"
 }
 
@@ -51,7 +51,7 @@ resource "aws_instance" "west_frontend" {
   count             = "${var.multi-region-deployment ? 1 : 0}"
   depends_on        = ["aws_instance.west_backend"]
   provider          = "aws.us-west-1"
-  ami               = "ami-07585467"
+  ami               = "ami-068670db424b01e9a"
   availability_zone = "${var.us-west-zones[count.index]}"
   instance_type     = "t2.micro"
 }
@@ -63,7 +63,7 @@ resource "aws_instance" "backend" {
 
   count             = 2
   availability_zone = "${var.us-east-zones[count.index]}"
-  ami               = "ami-66506c1c"
+  ami               = "ami-026c8acd92718196b"
   instance_type     = "t2.micro"
 }
 
@@ -73,7 +73,7 @@ resource "aws_instance" "west_backend" {
   }
 
   provider          = "aws.us-west-1"
-  ami               = "ami-07585467"
+  ami               = "ami-068670db424b01e9a"
   count             = "${var.multi-region-deployment ? 2 : 0}"
   availability_zone = "${var.us-west-zones[count.index]}"
   instance_type     = "t2.micro"
