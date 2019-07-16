@@ -1,22 +1,16 @@
 provider "aws" {
-  access_key = "ACCESS_KEY"
-  secret_key = "SECRET_KEY"
-  region     = "us-east-1"
+  region = "us-east-1"
 }
 
 provider "aws" {
-  alias      = "us-west-1"
-  access_key = "ACCESS_KEY"
-  secret_key = "SECRET_KEY"
-  region     = "us-west-1"
+  alias  = "us-west-1"
+  region = "us-west-1"
 }
 
-variable "us-east-zones" {
-  default = ["us-east-1a", "us-east-1b"]
-}
+data "aws_availability_zones" "us-east-1" {}
 
-variable "us-west-zones" {
-  default = ["us-west-1c", "us-west-1a"]
+data "aws_availability_zones" "us-west-1" {
+  provider = "aws.us-west-1"
 }
 
 variable "multi-region-deployment" {
@@ -38,10 +32,10 @@ resource "aws_instance" "frontend" {
   }
 
   depends_on        = ["aws_instance.backend"]
-  availability_zone = "${var.us-east-zones[count.index]}"
+  availability_zone = "${data.aws_availability_zones.us-east-1.names[count.index]}"
   ami               = "ami-026c8acd92718196b"
   instance_type     = "t2.micro"
-  count		    =  2
+  count             =  1
 }
 
 resource "aws_instance" "west_frontend" {
@@ -53,7 +47,7 @@ resource "aws_instance" "west_frontend" {
   depends_on        = ["aws_instance.west_backend"]
   provider          = "aws.us-west-1"
   ami               = "ami-068670db424b01e9a"
-  availability_zone = "${var.us-west-zones[count.index]}"
+  availability_zone = "${data.aws_availability_zones.us-west-1.names[count.index]}"
   instance_type     = "t2.micro"
 }
 
@@ -63,7 +57,7 @@ resource "aws_instance" "backend" {
   }
 
   count             = 2
-  availability_zone = "${var.us-east-zones[count.index]}"
+  availability_zone = "${data.aws_availability_zones.us-east-1.names[count.index]}"
   ami               = "ami-026c8acd92718196b"
   instance_type     = "t2.micro"
 }
@@ -76,7 +70,7 @@ resource "aws_instance" "west_backend" {
   provider          = "aws.us-west-1"
   ami               = "ami-068670db424b01e9a"
   count             = "${var.multi-region-deployment ? 2 : 0}"
-  availability_zone = "${var.us-west-zones[count.index]}"
+  availability_zone = "${data.aws_availability_zones.us-west-1.names[count.index]}"
   instance_type     = "t2.micro"
 }
 
@@ -94,4 +88,8 @@ output "west_frontend_ip" {
 
 output "west_backend_ips" {
   value = "${aws_instance.west_backend.*.public_ip}"
+}
+
+output "data-aws-azs-us-east" {
+  value = "${data.aws_availability_zones.us-east-1.*.names}"
 }
