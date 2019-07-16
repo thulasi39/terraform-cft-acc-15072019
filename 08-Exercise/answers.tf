@@ -16,7 +16,7 @@ variable "us-east-zones" {
 }
 
 variable "us-west-zones" {
-  default = ["us-west-1a", "us-west-1b"]
+  default = ["us-west-1a", "us-west-1c"]
 }
 
 resource "aws_instance" "west_frontend" {
@@ -68,7 +68,7 @@ resource "aws_instance" "west_backend" {
 }
 
 output "frontend_ip" {
-  value = "${aws_instance.frontend.public_ip}"
+  value = "${aws_instance.frontend.*.public_ip}"
 }
 
 output "backend_ips" {
